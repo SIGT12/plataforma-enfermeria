@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plataforma Académica de Enfermería · Grupo 02 (prototipo)</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f5f7;--card:#fff;--tx:#14161a;--mu:#5b616b;--bd:#c9cdd4;--pr:#1f3a68;--prt:#fff;--ok:#e6f2e8;--er:#fdeaea;--wa:#fff4d6;--hd:#e8ebf0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14161a;--card:#1d2026;--tx:#eceef1;--mu:#a2a8b2;--bd:#3a3f48;--pr:#8fb2ee;--prt:#10131a;--ok:#1f3324;--er:#3b2124;--wa:#3a3220;--hd:#272b33}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,Arial,sans-serif}
+header{background:var(--pr);color:var(--prt);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header b{font-size:16px} header select,header button{font:inherit;padding:5px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+nav{display:flex;gap:6px;padding:10px 16px;flex-wrap:wrap;border-bottom:1px solid var(--bd);background:var(--card)}
+nav button{font:inherit;padding:7px 12px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);cursor:pointer}
+nav button[aria-current=page]{background:var(--pr);color:var(--prt);border-color:var(--pr);font-weight:700}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:21px;margin:4px 0 4px}.sub{color:var(--mu);font-size:12.5px;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+label{display:block;font-weight:700;font-size:13px;margin-bottom:3px}
+input,select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);width:100%}
+.f{flex:1;min-width:150px}.f.s{flex:0 0 170px}
+.bad{border:3px solid var(--tx)!important}.err{font-weight:700;font-size:13px;margin-top:3px}
+.btn{font:inherit;font-weight:700;padding:8px 14px;border-radius:6px;border:1px solid var(--pr);background:var(--pr);color:var(--prt);cursor:pointer}
+.btn.sec{background:var(--card);color:var(--tx);border-color:var(--bd)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{background:var(--hd);text-align:left}th,td{padding:7px 9px;border:1px solid var(--bd)}
+.msg{border:3px solid var(--tx);border-radius:8px;padding:10px 12px;margin-bottom:12px;background:var(--card)}
+.msg.ok{border:2px solid var(--tx);background:var(--ok)}.msg.warn{background:var(--wa)}
+.dl{display:grid;grid-template-columns:170px 1fr;gap:5px 10px}.dl dt{font-weight:700}.dl dd{margin:0}
+.n{color:var(--mu);font-size:12.5px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:560px){.dl{grid-template-columns:1fr}.f.s{flex:1 1 100%}}
+</style></head><body>
+<header><b>Plataforma Académica · Enfermería · Grupo 02</b>
+<span><label for="u" style="display:inline;color:inherit">Sesión:</label> <select id="u"></select> <button id="rs" title="Restaura los datos ficticios de DAT-10">Reiniciar datos</button></span></header>
+<nav id="nav" aria-label="Menú del rol"></nav>
+<main id="m"></main>
+<script>
+"use strict";
+const HOY="2026-11-10";
+const AMB={1:{n:"Sala de simulación (DEMO)",t:"INTERNA"},2:{n:"Servicio hospitalario ficticio (DEMO)",t:"EXTERNA"},3:{n:"Centro de salud ficticio (DEMO)",t:"EXTERNA"}};
+const NOM={"E-01":"Estudiante Ficticio Uno","E-02":"Estudiante Ficticio Dos","E-03":"Estudiante Ficticio Tres","E-04":"Estudiante Ficticio Cuatro","E-05":"Estudiante Ficticio Cinco","D-01":"Docente Tutor Ficticio Uno","D-02":"Docente Tutor Ficticio Dos"};
+const USERS=["E-01","E-02","E-03","E-04","E-05","D-01","D-02"];
+function seed(){return{
+ rot:[{id:1,e:"E-01",a:1,d:"D-01",i:"2026-09-01",f:"2026-09-30"},{id:2,e:"E-01",a:1,d:"D-01",i:"2026-10-01",f:"2026-10-31"},{id:3,e:"E-02",a:2,d:"D-01",i:"2026-10-01",f:"2026-10-31"},{id:4,e:"E-03",a:1,d:"D-01",i:"2026-10-01",f:"2026-10-31"},{id:5,e:"E-04",a:3,d:"D-02",i:"2026-10-01",f:"2026-10-31"},{id:6,e:"E-05",a:3,d:null,i:"2026-10-01",f:"2026-10-31"}],
+ curso:["E-01","E-04"],
+ act:[{id:1,r:2,f:"2026-10-01",t:"Higiene de manos"},{id:2,r:2,f:"2026-10-05",t:"Control de signos vitales en maniquí"},{id:3,r:2,f:"2026-10-06",t:"Curación simulada en maniquí"},{id:4,r:2,f:"2026-10-31",t:"Control de signos vitales"},{id:5,r:1,f:"2026-09-30",t:"Higiene de manos"},{id:6,r:3,f:"2026-10-02",t:"Actividad previa"},{id:7,r:5,f:"2026-10-08",t:"Toma de presión arterial"},{id:8,r:5,f:"2026-10-08",t:"Toma de presión arterial"},{id:9,r:6,f:"2026-10-12",t:"Registro de signos"}],
+ val:{1:{d:"D-01",f:"2026-10-02"},2:{d:"D-01",f:"2026-10-06"},5:{d:"D-01",f:"2026-10-01"},7:{d:"D-02",f:"2026-10-09"}},
+ prot:[{t:"Protocolo de bioseguridad",tipo:"Bioseguridad",v:[{n:1,c:"Contenido ficticio, versión 1 (reemplazada).",p:"2026-03-01",r:"2026-09-30"},{n:2,c:"Contenido ficticio, versión 2 (vigente).",p:"2026-10-01",r:null}]},{t:"Protocolo de seguridad del paciente",tipo:"Seguridad del paciente",v:[{n:1,c:"Contenido ficticio, versión 1 (vigente).",p:"2026-03-01",r:null}]}]
+};}
+let D=seed(), S={u:"E-01",view:"mis",desde:"2026-10-01",hasta:"2026-10-31",form:{r:"",f:"",t:""},msg:null,errs:{},confirm:false,sel:null,last:null,pdet:null,adesde:"2026-10-01",ahasta:"2026-10-31"};
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fd=iso=>iso?iso.split("-").reverse().join("/"):"—", isDoc=()=>S.u[0]==="D";
+const estado=id=>D.val[id]?"Validada":"Pendiente de validación";
+const rotOf=id=>D.rot.find(r=>r.id===id), actOf=id=>D.act.find(a=>a.id===id);
+const rotTxt=r=>`${AMB[r.a].n.replace(" (DEMO)","")} · ${AMB[r.a].t==="INTERNA"?"Interna":"Externa"} · ${fd(r.i)} al ${fd(r.f)}`;
+const validoTxt=id=>D.val[id]?`${D.val[id].d} · ${fd(D.val[id].f)}`:"—";
+function go(v,extra){S.view=v;S.msg=null;S.errs={};S.confirm=false;Object.assign(S,extra||{});render()}
+function nav(){const e=[["mis","Mis actividades"],["reg","Registrar actividad"],["prot","Protocolos"]],d=[["pend","Pendientes de validación"],["avance","Avance por estudiante"],["prot","Protocolos"]];
+ const base={mis:"mis",ok:"mis",reg:"reg",pend:"pend",rev:"pend",val:"pend",avance:"avance",prot:"prot",pdet:"prot"}[S.view];
+ $("#nav").innerHTML=(isDoc()?d:e).map(([k,t])=>`<button data-go="${k}" ${base===k?'aria-current="page"':""}>${t}</button>`).join("")}
+// ---- vistas
+function vMis(){const rows=D.act.filter(a=>rotOf(a.r).e===S.u&&a.f>=S.desde&&a.f<=S.hasta).sort((a,b)=>a.f.localeCompare(b.f)||a.id-b.id);
+ return `<h1>Mis actividades</h1><p class="sub">Estudiante: ${S.u} ${NOM[S.u]} (dato de la sesión) · datos ficticios</p>
+ <div class="card"><div class="row"><div class="f s"><label for="d">Desde</label><input id="d" type="date" value="${S.desde}"></div><div class="f s"><label for="h">Hasta (incluido)</label><input id="h" type="date" value="${S.hasta}"></div>
+ <button class="btn sec" data-act="filtrar">Ver actividades</button><button class="btn" data-go="reg" style="margin-left:auto">Registrar actividad nueva</button></div>
+ ${S.errs.p?`<p class="err">${S.errs.p}</p>`:""}
+ ${rows.length?`<div class="tw"><table><tr><th>Fecha</th><th>Actividad</th><th>Ámbito</th><th>Estado</th><th>Validó</th></tr>${rows.map(a=>`<tr><td>${fd(a.f)}</td><td>${esc(a.t)}</td><td>${AMB[rotOf(a.r).a].n.replace(" (DEMO)","")}</td><td>${estado(a.id)}</td><td>${validoTxt(a.id)}</td></tr>`).join("")}</table></div>`:`<p>No tiene actividades en este período.</p>`}
+ <p class="n">«—» = todavía no existe constancia del docente tutor.</p></div>`}
+function vReg(){const mine=D.rot.filter(r=>r.e===S.u),F=S.form,er=S.errs;
+ if(S.confirm)return `<h1>¿Descartar los datos ingresados?</h1><div class="card"><p>Hay datos que todavía no se registraron. Si sale ahora, se perderán.</p><div class="actions"><button class="btn" data-act="seguir">Seguir editando</button><button class="btn sec" data-act="descartar">Descartar y volver a Mis actividades</button></div></div>`;
+ if(!mine.length)return `<h1>Registrar actividad de práctica</h1><div class="msg warn">No tiene rotaciones asignadas. Consulte a su docente tutor.</div>`;
+ const n=Object.keys(er).length;
+ return `<h1>Registrar actividad de práctica</h1><p class="sub">Estudiante: ${S.u} ${NOM[S.u]} (sesión, solo lectura)</p>
+ ${S.msg?`<div class="msg" role="alert"><b>${S.msg[0]}</b><br>${S.msg[1]}</div>`:n?`<div class="msg" role="alert"><b>Revise ${n} dato${n>1?"s":""} antes de registrar</b><br>La actividad no se registró. Los demás valores se conservan.</div>`:""}
+ <div class="card"><div class="f" style="margin-bottom:12px"><label for="r">Rotación (obligatorio)</label><select id="r" class="${er.r||S.msg?"bad":""}"><option value="">— Elija una rotación —</option>${mine.map(r=>`<option value="${r.id}" ${F.r==r.id?"selected":""}>${rotTxt(r)}</option>`).join("")}</select>${er.r?`<div class="err">Error en «Rotación»: ${er.r}</div>`:""}</div>
+ <div class="f s" style="margin-bottom:12px"><label for="f">Fecha de la actividad (obligatorio)</label><input id="f" type="date" class="${er.f?"bad":""}" value="${F.f}">${er.f?`<div class="err">Error en «Fecha»: ${er.f}</div>`:""}</div>
+ <div class="f"><label for="t">Descripción de la actividad (obligatorio)</label><textarea id="t" rows="3" class="${er.t?"bad":""}">${esc(F.t)}</textarea>${er.t?`<div class="err">Error en «Descripción»: ${er.t}</div>`:""}</div>
+ <p class="n">Revise los datos antes de registrar. El docente tutor validará la actividad posteriormente.</p>
+ <div class="actions"><button class="btn" data-act="registrar">Registrar actividad</button><button class="btn sec" data-act="cancelar">Cancelar y volver a Mis actividades</button></div></div>`}
+function vOk(){const a=actOf(S.last),r=rotOf(a.r);return `<h1>Actividad registrada</h1><div class="card"><p><b>Actividad ${a.id} · ${fd(a.f)} · ${rotTxt(r).split(" · ").slice(0,2).join(" · ")}</b></p><p>${esc(a.t)}</p><p><b>Estado: Pendiente de validación</b></p><p class="n">El registro no equivale a la validación: la constancia la emite el docente tutor.</p><div class="actions"><button class="btn" data-go="mis">Ver mis actividades</button><button class="btn sec" data-go="reg" data-clear="1">Registrar otra actividad</button></div></div>`}
+const mios=()=>D.act.filter(a=>rotOf(a.r).d===S.u);
+function vPend(){const rows=mios().filter(a=>!D.val[a.id]).sort((a,b)=>a.f.localeCompare(b.f)||rotOf(a.r).e.localeCompare(rotOf(b.r).e)||a.id-b.id);
+ return `<h1>Actividades pendientes de validación</h1><p class="sub">Docente tutor: ${S.u} ${NOM[S.u]} · estudiantes a su cargo (por rotación)</p><div class="card">${rows.length?`<div class="tw"><table><tr><th>Fecha</th><th>Estudiante</th><th>Actividad</th><th>Ámbito</th><th>Acción</th></tr>${rows.map(a=>`<tr><td>${fd(a.f)}</td><td>${rotOf(a.r).e}</td><td>${esc(a.t)}</td><td>${AMB[rotOf(a.r).a].n.replace(" (DEMO)","")}</td><td><button class="btn sec" data-rev="${a.id}">Revisar actividad</button></td></tr>`).join("")}</table></div>`:"<p>No tiene actividades pendientes de validación.</p>"}</div>`}
+function vRev(){const a=actOf(S.sel),r=rotOf(a.r);return `<h1>Revisar y validar actividad</h1>${S.msg?`<div class="msg" role="alert"><b>${S.msg[0]}</b><br>${S.msg[1]}</div>`:""}<div class="card"><dl class="dl"><dt>Estudiante</dt><dd>${r.e} ${NOM[r.e]}</dd><dt>Rotación</dt><dd>${rotTxt(r)}</dd><dt>Fecha de la actividad</dt><dd>${fd(a.f)}</dd><dt>Actividad realizada</dt><dd>${esc(a.t)}</dd><dt>Estado actual</dt><dd><b>${estado(a.id)}${D.val[a.id]?" · "+validoTxt(a.id):""}</b></dd></dl>
+ <p class="n">Al validar, el sistema registra su constancia: docente (sesión) y fecha de validación.</p><div class="actions">${D.val[a.id]?"":`<button class="btn" data-act="validar">Validar actividad</button>`}<button class="btn sec" data-go="pend">Volver a pendientes</button></div></div>`}
+function vVal(){const a=actOf(S.sel),r=rotOf(a.r);return `<h1>Actividad validada</h1><div class="card"><p><b>${r.e} · ${fd(a.f)} · ${esc(a.t)}</b></p><p><b>Estado: Validada · Validó: ${D.val[a.id].d} · Fecha de validación: ${fd(D.val[a.id].f)}</b></p><p class="n">El estudiante verá esta constancia en «Mis actividades».</p><div class="actions"><button class="btn" data-go="pend">Volver a pendientes</button><button class="btn sec" data-go="avance">Ver avance por estudiante</button></div></div>`}
+function vAvance(){const rs=D.rot.filter(r=>r.d===S.u),es=[...new Set(rs.map(r=>r.e))].sort();
+ const rows=es.map(e=>{const as=D.act.filter(a=>{const r=rotOf(a.r);return r.e===e&&r.d===S.u&&a.f>=S.adesde&&a.f<=S.ahasta});const v=as.filter(a=>D.val[a.id]).length;return[e,as.length,v,as.length-v]});
+ return `<h1>Avance de validación por estudiante</h1><p class="sub">Una fila = un estudiante a su cargo · unidad: cantidad de actividades · datos ficticios</p><div class="card"><div class="row"><div class="f s"><label for="ad">Desde</label><input id="ad" type="date" value="${S.adesde}"></div><div class="f s"><label for="ah">Hasta (incluido)</label><input id="ah" type="date" value="${S.ahasta}"></div><button class="btn" data-act="aplicar">Aplicar período</button><button class="btn sec" data-go="pend" style="margin-left:auto">Ver pendientes</button></div>
+ ${S.errs.p?`<p class="err">${S.errs.p}</p>`:""}${rows.length?`<div class="tw"><table><tr><th>Estudiante</th><th>Actividades registradas</th><th>Validadas</th><th>Pendientes del período</th></tr>${rows.map(r=>`<tr><td>${r[0]} ${NOM[r[0]]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</table></div>`:"<p>No tiene estudiantes a su cargo.</p>"}
+ <p class="n">0 = el estudiante no registró actividades en el período (cero real). «Pendientes del período» puede diferir de la lista de pendientes, que no filtra por fecha.</p></div>`}
+function vProt(){return `<h1>Protocolos vigentes</h1><p class="sub">Solo se muestra la versión vigente de cada protocolo</p><div class="card"><div class="tw"><table><tr><th>Protocolo</th><th>Tipo</th><th>Versión vigente</th><th>Publicada el</th><th>Acción</th></tr>${D.prot.map((p,i)=>{const v=p.v.find(x=>!x.r);return `<tr><td>${p.t}</td><td>${p.tipo}</td><td>${v?v.n:"—"}</td><td>${v?fd(v.p):"—"}</td><td><button class="btn sec" data-pdet="${i}">Ver protocolo</button></td></tr>`}).join("")}</table></div></div>`}
+function vPdet(){const p=D.prot[S.pdet],v=p.v.find(x=>!x.r);return `<h1>${p.t}</h1>${v?`<div class="card"><dl class="dl"><dt>Tipo</dt><dd>${p.tipo}</dd><dt>Versión</dt><dd>${v.n} (vigente)</dd><dt>Publicada el</dt><dd>${fd(v.p)}</dd><dt>Contenido</dt><dd>${v.c}</dd></dl>`:`<div class="msg" role="alert"><b>Este protocolo no tiene una versión vigente</b><br>No hay una versión publicada y vigente para mostrar. Consulte a su docente tutor.</div><div class="card">`}<div class="actions"><button class="btn" data-go="prot">Volver a protocolos</button></div></div>`}
+const V={mis:vMis,reg:vReg,ok:vOk,pend:vPend,rev:vRev,val:vVal,avance:vAvance,prot:vProt,pdet:vPdet};
+function render(){const ok=isDoc()?["pend","rev","val","avance","prot","pdet"]:["mis","reg","ok","prot","pdet"];if(!ok.includes(S.view))S.view=isDoc()?"pend":"mis";nav();$("#m").innerHTML=V[S.view]();const t=$("#m h1");if(t){t.tabIndex=-1;}}
+// ---- acciones
+function readForm(){const g=i=>document.getElementById(i);if(g("r"))S.form={r:g("r").value,f:g("f").value,t:g("t").value}}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.id==="rs"){D=seed();S.form={r:"",f:"",t:""};go(isDoc()?"pend":"mis");return}
+ if(b.dataset.go){if(b.dataset.clear)S.form={r:"",f:"",t:""};go(b.dataset.go);return}
+ if(b.dataset.rev){go("rev",{sel:+b.dataset.rev});return}
+ if(b.dataset.pdet){go("pdet",{pdet:+b.dataset.pdet});return}
+ const a=b.dataset.act;if(!a)return;
+ if(a==="filtrar"){const d=$("#d").value,h=$("#h").value;S.desde=d;S.hasta=h;S.errs=(d&&h&&d>h)?{p:"Error en el período: «Hasta» no puede ser anterior a «Desde»."}:{};render()}
+ if(a==="aplicar"){const d=$("#ad").value,h=$("#ah").value;S.adesde=d;S.ahasta=h;S.errs=(d&&h&&d>h)?{p:"Error en el período: «Hasta» no puede ser anterior a «Desde»."}:{};render()}
+ if(a==="cancelar"){readForm();if(S.form.r||S.form.f||S.form.t.trim()){S.confirm=true;render()}else go("mis")}
+ if(a==="seguir"){S.confirm=false;render()}
+ if(a==="descartar"){S.form={r:"",f:"",t:""};go("mis")}
+ if(a==="registrar"){readForm();const F=S.form,er={};S.msg=null;
+  if(!F.r)er.r="elija la rotación en la que realizó la actividad.";if(!F.f)er.f="indique la fecha en que realizó la actividad.";if(!F.t.trim())er.t="indique qué actividad realizó.";
+  S.errs=er;if(Object.keys(er).length){render();return}
+  const r=rotOf(+F.r);
+  if(AMB[r.a].t==="EXTERNA"&&!D.curso.includes(S.u)){S.msg=["No se registró la actividad","Esta rotación es externa y en el sistema no consta la aprobación del curso de bioseguridad. Sus datos se conservan. Consulte a su docente tutor o elija otra rotación."];render();return}
+  const id=Math.max(...D.act.map(x=>x.id))+1;D.act.push({id,r:r.id,f:F.f,t:F.t.trim()});S.last=id;S.form={r:"",f:"",t:""};go("ok")}
+ if(a==="validar"){const x=actOf(S.sel);
+  if(D.val[x.id]){S.msg=["No se registró otra constancia",`Esta actividad ya fue validada por ${D.val[x.id].d} el ${fd(D.val[x.id].f)}.`];render();return}
+  if(rotOf(x.r).d!==S.u){S.msg=["No puede validar esta actividad","La actividad no pertenece a un estudiante a su cargo."];render();return}
+  D.val[x.id]={d:S.u,f:HOY};go("val")}
+});
+$("#u").innerHTML=USERS.map(u=>`<option value="${u}">${u} · ${NOM[u]}</option>`).join("");
+$("#u").addEventListener("change",e=>{S.u=e.target.value;S.form={r:"",f:"",t:""};go(isDoc()?"pend":"mis")});
+render();
+</script></body></html>
